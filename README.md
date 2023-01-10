@@ -8,3 +8,9 @@
   docker stop cbbce09e24ec
   docker start cbbce09e24ec
 ```
+
+#### common schema
+```sh
+  publisher        --> NATS     <-- subscriber
+  (send message)                  (received message)
+```

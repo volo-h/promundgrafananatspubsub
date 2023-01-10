@@ -60,7 +60,7 @@ func main() {
   // nc, err := nats.Connect("tls://nats.example.com:4222", nats.Name("inspection-service-1"),
   //            nats.RootCAs("../ca.pem"),nats.UserInfo("inspection_service", "ins123"))
 
-    nc, err := nats.Connect("192.168.0.103:4222")
+    nc, err := nats.Connect("host.docker.internal:4222")
 
   if err != nil {
     ErrorLogger.Println(err)

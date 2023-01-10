@@ -1,11 +1,21 @@
 version: "3.8"
 
 services:
+   nats:
+     container_name: nats
+     image: nats:2.7.0-alpine
+     ports:
+       - 4222:4222
+     volumes:
+       - ./build/configs/nats/nats-server.conf:/etc/nats/nats-server.conf:ro
+
    publisher:
      container_name: publisher
      build:
        context: "."
        dockerfile: "build/publisher/Dockerfile"
+     depends_on:
+       - subscriber
      ports:
        - "9001:9001"
 
@@ -14,5 +24,7 @@ services:
      build:
        context: "."
        dockerfile: "build/subscriber/Dockerfile"
+     depends_on:
+       - nats
      ports:
        - "9000:9000"

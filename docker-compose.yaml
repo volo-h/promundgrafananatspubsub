@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+   publisher:
+     container_name: publisher
+     build:
+       context: "."
+       dockerfile: "build/publisher/Dockerfile"
+     ports:
+       - "9001:9001"
+
+   subscriber:
+     container_name: subscriber
+     build:
+       context: "."
+       dockerfile: "build/subscriber/Dockerfile"
+     ports:
+       - "9000:9000"

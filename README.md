@@ -11,8 +11,8 @@
 
 #### common schema
 ```sh
-  publisher        --> NATS     <-- subscriber
-  (send message)                  (received message)
+  publisher        --> NATS        <-- subscriber
+  (send message)     (subject)     (received message)
 ```
 
 ### TIPS:
@@ -37,3 +37,18 @@
   export DOCKER_BUILDKIT=0
   export COMPOSE_DOCKER_CLI_BUILD=0
 ```
+
+#### NATS
+```sh
+  nats-server --config node-auth2.conf -V
+```
+by default stated at port 4222
+http://localhost:8222/varz
+
+#### Prometheus Nats Exporter
+https://github.com/nats-io/prometheus-nats-exporter.git
+```sh
+  ./prometheus-nats-exporter -varz "http://localhost:8222"
+```
+http://localhost:7777/metrics
+

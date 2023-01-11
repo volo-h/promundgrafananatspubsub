@@ -1,30 +1,100 @@
 version: "3.8"
 
 services:
-   nats:
-     container_name: nats
-     image: nats:2.7.0-alpine
-     ports:
-       - 4222:4222
-     volumes:
-       - ./build/configs/nats/nats-server.conf:/etc/nats/nats-server.conf:ro
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION:-7.1.5}
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_USERS_DEFAULT_THEME=light
+      - GF_LOG_MODE=console
+      - GF_LOG_LEVEL=critical
+      - GF_PANELS_ENABLE_ALPHA=true
+    volumes:
+      - ./build/configs/grafana/provisioning/dashboards.yml:/etc/grafana/provisioning/dashboards/provisioning-dashboards.yaml:ro
+      - ./build/configs/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/provisioning-datasources.yaml:ro
+      - ./build/dashboards/grafana-nats-dash.json:/var/lib/grafana/dashboards/grafana-nats-dash.json:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    networks:
+      - monitoring
 
-   publisher:
-     container_name: publisher
-     build:
-       context: "."
-       dockerfile: "build/publisher/Dockerfile"
-     depends_on:
-       - subscriber
-     ports:
-       - "9001:9001"
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v2.40.2}
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--log.level=error'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.external-url=http://localhost:9090'
+    volumes:
+      - ./build/configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - 9090:9090
+    networks:
+      - monitoring
 
-   subscriber:
-     container_name: subscriber
-     build:
-       context: "."
-       dockerfile: "build/subscriber/Dockerfile"
-     depends_on:
-       - nats
-     ports:
-       - "9000:9000"
+  nats:
+    container_name: nats
+    image: nats:2.7.0-alpine
+    ports:
+      - 4222:4222
+      - 8222:8222
+    volumes:
+      - ./build/configs/nats/nats-server.conf:/etc/nats/nats-server.conf:ro
+    networks:
+      - monitoring
+
+  publisher:
+    container_name: publisher
+    build:
+      context: "."
+      dockerfile: "build/publisher/Dockerfile"
+    depends_on:
+      - subscriber
+    ports:
+      - "9001:9001"
+    networks:
+      - monitoring
+
+  subscriber:
+    container_name: subscriber
+    build:
+      context: "."
+      dockerfile: "build/subscriber/Dockerfile"
+    depends_on:
+      - nats
+    ports:
+      - "9000:9000"
+    networks:
+      - monitoring
+
+  # https://github.com/nats-io/prometheus-nats-exporter#run
+  prometheus-nats-exporter:
+    container_name: prometheus-nats-exporter
+    image: natsio/prometheus-nats-exporter:latest
+    command: "-varz http://host.docker.internal:8222"
+    depends_on:
+      - nats
+    ports:
+      - "7777:7777"
+    networks:
+      - monitoring
+
+volumes:
+  grafana-data: {}
+  prometheus-data: {}
+
+networks:
+  monitoring:
+    name: monitoring

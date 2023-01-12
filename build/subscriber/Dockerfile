@@ -12,5 +12,5 @@ FROM alpine:3.10 as run
 
 COPY --from=build /source/bin/client /subscriber
 
-ENTRYPOINT ["/subscriber"]
-
+#ENTRYPOINT ["/subscriber"]
+CMD ["/bin/sh", "-c", "./subscriber 2>> /var/lib/subscriber/subscriber.log"]

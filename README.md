@@ -38,6 +38,25 @@
   export COMPOSE_DOCKER_CLI_BUILD=0
 ```
 
+#### error 2 happens when `make docker-up`
+```sh
+  docker-compose -f docker-compose.yaml up --build
+  Pulling loki (grafana/loki:2.6.1)...
+  ERROR: Head https://registry-1.docker.io/v2/grafana/loki/manifests/2.6.1: unauthorized: incorrect username or password
+```
+
+#### solution 2
+```sh
+  docker logout
+  docker login
+  use your 'username' not your 'email'
+```
+
+#### how investigate volume's?
+```sh
+  docker volume inspect promundgrafananatspubsub_subscriber-data
+```
+
 #### NATS
 ```sh
   nats-server --config node-auth2.conf -V

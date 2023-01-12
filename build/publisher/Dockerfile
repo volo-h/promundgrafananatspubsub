@@ -12,4 +12,5 @@ FROM alpine:3.10 as run
 
 COPY --from=build /source/bin/publisher /publisher
 
-ENTRYPOINT ["/publisher"]
+#ENTRYPOINT ["/publisher"]
+CMD ["/bin/sh", "-c", "./publisher 2>> /var/lib/publisher/publisher.log"]

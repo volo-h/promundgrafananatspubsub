@@ -33,13 +33,13 @@ scrape_configs:
           job: subscriber
           __path__: /var/lib/subscriber/*log
 
-#  - job_name: nats
-#    static_configs:
-#      - targets:
-#          - localhost
-#        labels:
-#          job: nats
-#          __path__: /var/log/*log
+  - job_name: nats
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nats
+          __path__: /var/log/*log
 
 #          job: system
 #          __path__: /var/lib/docker/containers/*/*log

@@ -18,6 +18,7 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
       - publisher-data:/var/lib/publisher
       - subscriber-data:/var/lib/subscriber
+      - nats-data:/var/log
       - ./build/configs/promtail:/etc/promtail
     # ports:
     #   - "1514:1514" # this is only needed if you are going to send syslogs
@@ -76,6 +77,7 @@ services:
       - 4222:4222
       - 8222:8222
     volumes:
+      - nats-data:/var/log
       - ./build/configs/nats/nats-server.conf:/etc/nats/nats-server.conf:ro
     networks:
       - monitoring
@@ -125,6 +127,7 @@ volumes:
   prometheus-data: {}
   publisher-data: {}
   subscriber-data: {}
+  nats-data: {}
 
 networks:
   monitoring:

@@ -54,7 +54,21 @@
 
 #### how investigate volume's?
 ```sh
+  docker volume ls
   docker volume inspect promundgrafananatspubsub_subscriber-data
+```
+
+#### drop all volumes / specific volume
+```sh
+  docker volume prune
+  docker system prune
+  
+  docker volume rm [your_volume]
+```
+
+#### show existing network's
+```sh
+  docker network ls
 ```
 
 #### NATS
